@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Détails | Campus Events</title>
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container flex-nav">
+        <a href="index.html" class="logo">Campus<span>Events</span></a>
+        <a href="index.html" style="font-size:14px;font-weight:600;color:var(--muted);padding:9px 16px;border-radius:99px;transition:background .15s">← Retour à l'agenda</a>
+    </div>
+</header>
+
+<div class="details-hero" id="heroImg" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400')"></div>
+
+<main class="container details-container">
+    <div class="details-content">
+        <p class="details-date" id="detailsDate">—</p>
+        <h1 id="detailsTitle">Chargement...</h1>
+
+        <div class="details-meta">
+            <div class="meta-item">
+                <div class="meta-icon">⏰</div>
+                <div><strong id="detailsTime">—</strong></div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-icon">📍</div>
+                <div><strong id="detailsLocation">—</strong></div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-icon">👥</div>
+                <div>
+                    <strong>Ouvert à tous les étudiants</strong><br>
+                    <span style="color:var(--muted);font-size:13px">Entrée gratuite</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-desc">
+            <h3>À propos de cet événement</h3>
+            <p id="detailsDesc">—</p>
+        </div>
+    </div>
+
+    <aside class="details-checkout">
+        <div class="checkout-card">
+            <p class="price-main">Gratuit</p>
+            <p class="price-sub">Places limitées</p>
+            <a href="#" class="btn-ticket" onclick="alert('Fonctionnalité de réservation à venir !')">Réserver ma place</a>
+            <p class="checkout-info">🔒 Inscription sécurisée · Annulation gratuite</p>
+        </div>
+    </aside>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://rgzabfwwviqpbrsqqlkp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const IMAGES = [
+    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400',
+    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1400',
+    'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=1400',
+    'https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&q=80&w=1400',
+    'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=1400',
+];
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return '📅 ' + d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+async function loadEvent() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    let query = db.from('events').select('*');
+    query = id ? query.eq('id', id).single() : query.order('created_at', { ascending: false }).limit(1).single();
+
+    const { data, error } = await query;
+
+    if (error || !data) {
+        document.getElementById('detailsTitle').textContent = 'Événement introuvable';
+        return;
+    }
+
+    document.title = data.title + ' | Campus Events';
+    document.getElementById('detailsDate').textContent     = formatDate(data.date);
+    document.getElementById('detailsTitle').textContent    = data.title;
+    document.getElementById('detailsTime').textContent     = data.time ? 'À ' + data.time : 'Heure à confirmer';
+    document.getElementById('detailsLocation').textContent = data.location || '—';
+    document.getElementById('detailsDesc').textContent     = data.description || 'Aucune description disponible.';
+    document.getElementById('heroImg').style.backgroundImage = `url('${IMAGES[data.id % IMAGES.length]}')`;
+}
+
+window.onload = loadEvent;
+</script>
+</body>
+</html>
