@@ -1,107 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Détails | Campus Events</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Détails | UniEvents</title>
 </head>
 <body>
 
 <header class="navbar">
-    <div class="container flex-nav">
-        <a href="index.html" class="logo">Campus<span>Events</span></a>
-        <a href="index.html" style="font-size:14px;font-weight:600;color:var(--muted);padding:9px 16px;border-radius:99px;transition:background .15s">← Retour à l'agenda</a>
+  <div class="container flex-nav">
+    <a href="index.html" class="logo"><span class="logo-sup"></span>Uni<span class="logo-accent">Events</span></a>
+    <nav><ul class="nav-links">
+      <li><a href="index.html">Agenda</a></li>
+    </ul></nav>
+    <div class="nav-right">
+      <div id="userChip" class="user-chip" style="display:none">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userName"></span>
+      </div>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Retour à l'agenda</a>
     </div>
+  </div>
 </header>
 
-<div class="details-hero" id="heroImg" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400')"></div>
+<div class="details-hero" id="detailsHero" style="background-image:url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400')">
+  <div class="details-hero-content">
+    <div class="container">
+      <div class="details-eyebrow" id="detailsCat">🎓 Événement campus</div>
+      <h1 id="detailsTitle">Chargement…</h1>
+      <div class="details-hero-meta">
+        <div class="details-hero-meta-item">📅 <span id="detailsDate">—</span></div>
+        <div class="details-hero-meta-item">⏰ <span id="detailsTime">—</span></div>
+        <div class="details-hero-meta-item">📍 <span id="detailsLocShort">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<main class="container details-container">
+<div class="container">
+  <div class="details-layout">
     <div class="details-content">
-        <p class="details-date" id="detailsDate">—</p>
-        <h1 id="detailsTitle">Chargement...</h1>
-
-        <div class="details-meta">
-            <div class="meta-item">
-                <div class="meta-icon">⏰</div>
-                <div><strong id="detailsTime">—</strong></div>
-            </div>
-            <div class="meta-item">
-                <div class="meta-icon">📍</div>
-                <div><strong id="detailsLocation">—</strong></div>
-            </div>
-            <div class="meta-item">
-                <div class="meta-icon">👥</div>
-                <div>
-                    <strong>Ouvert à tous les étudiants</strong><br>
-                    <span style="color:var(--muted);font-size:13px">Entrée gratuite</span>
-                </div>
-            </div>
+      <!-- Organizer -->
+      <div class="details-organizer">
+        <div class="organizer-avatar" id="orgAvatar">U</div>
+        <div>
+          <div class="organizer-name" id="orgName">Association Étudiante</div>
+          <div class="organizer-label">Organisateur de l'événement</div>
         </div>
+        <button class="organizer-follow">+ Suivre</button>
+      </div>
 
-        <div class="details-desc">
-            <h3>À propos de cet événement</h3>
-            <p id="detailsDesc">—</p>
+      <!-- Info grid -->
+      <div class="details-info-grid">
+        <div class="detail-info-card">
+          <div class="detail-info-icon">📅</div>
+          <div><div class="detail-info-label">Date</div><div class="detail-info-value" id="infoDate">—</div></div>
         </div>
+        <div class="detail-info-card">
+          <div class="detail-info-icon">⏰</div>
+          <div><div class="detail-info-label">Heure</div><div class="detail-info-value" id="infoTime">—</div></div>
+        </div>
+        <div class="detail-info-card">
+          <div class="detail-info-icon">📍</div>
+          <div><div class="detail-info-label">Lieu</div><div class="detail-info-value" id="infoLoc">—</div></div>
+        </div>
+        <div class="detail-info-card">
+          <div class="detail-info-icon">🎓</div>
+          <div><div class="detail-info-label">Public</div><div class="detail-info-value">Tous les étudiants</div></div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <h3 class="details-section-title">À propos de cet événement</h3>
+      <p class="details-desc-text" id="detailsDesc">—</p>
+
+      <!-- Tags -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px">
+        <span id="detailsTag" style="display:inline-flex;align-items:center;gap:6px;background:#ede9fe;color:var(--c-brand);font-size:12px;font-weight:700;padding:5px 12px;border-radius:var(--r-pill)"></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#15803d;font-size:12px;font-weight:700;padding:5px 12px;border-radius:var(--r-pill)">✅ Entrée gratuite</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;background:#fff7ed;color:#c2410c;font-size:12px;font-weight:700;padding:5px 12px;border-radius:var(--r-pill)">🎓 Campus officiel</span>
+      </div>
     </div>
 
-    <aside class="details-checkout">
-        <div class="checkout-card">
-            <p class="price-main">Gratuit</p>
-            <p class="price-sub">Places limitées</p>
-            <a href="#" class="btn-ticket" onclick="alert('Fonctionnalité de réservation à venir !')">Réserver ma place</a>
-            <p class="checkout-info">🔒 Inscription sécurisée · Annulation gratuite</p>
-        </div>
+    <aside>
+      <div class="checkout-card">
+        <div class="checkout-price-main">Gratuit</div>
+        <div class="checkout-price-sub">Places limitées · Inscription conseillée</div>
+        <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;display:flex;margin-bottom:12px" onclick="reservePlace(event)">🎟 Réserver ma place</a>
+        <a href="#" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;display:flex" onclick="shareEvent(event)">📤 Partager l'événement</a>
+        <div class="checkout-divider"></div>
+        <div class="checkout-info-row"><span>📅 Date</span><strong id="checkDate">—</strong></div>
+        <div class="checkout-info-row"><span>⏰ Heure</span><strong id="checkTime">—</strong></div>
+        <div class="checkout-info-row"><span>📍 Lieu</span><strong id="checkLoc">—</strong></div>
+        <div class="checkout-divider"></div>
+        <div class="checkout-trust">🔒 Inscription sécurisée · Annulation gratuite</div>
+      </div>
     </aside>
-</main>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg">Action effectuée</span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://rgzabfwwviqpbrsqqlkp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
-
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const IMAGES = [
-    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400',
-    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1400',
-    'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=1400',
-    'https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&q=80&w=1400',
-    'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=1400',
-];
-
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr + 'T00:00:00');
-    return '📅 ' + d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const SUPABASE_URL='https://rgzabfwwviqpbrsqqlkp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
+const {createClient}=supabase; const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+const IMGS=['https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400','https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1400','https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=1400','https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&q=80&w=1400','https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=1400'];
+const CATS={hackathon:{emoji:'💻',label:'Hackathon'},conférence:{emoji:'🎤',label:'Conférence'},concert:{emoji:'🎵',label:'Concert'},sport:{emoji:'🏆',label:'Sport'},atelier:{emoji:'🎨',label:'Atelier'},afterwork:{emoji:'🥂',label:'Afterwork'},soirée:{emoji:'🌙',label:'Soirée'}};
+function getCat(ev){return Object.keys(CATS).find(k=>(ev.title+' '+(ev.description||'')).toLowerCase().includes(k))||null;}
+function showToast(m,i='✓'){document.getElementById('toastMsg').textContent=m;document.getElementById('toastIcon').textContent=i;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function fmtDate(s){if(!s)return '';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
+async function initAuth(){const{data:{session}}=await db.auth.getSession();if(session){const u=session.user,f=u.user_metadata?.first_name||u.email.split('@')[0];document.getElementById('userAvatar').textContent=f.slice(0,2).toUpperCase();document.getElementById('userName').textContent=f;document.getElementById('userChip').style.display='flex';}}
+async function loadEvent(){
+  const params=new URLSearchParams(window.location.search);
+  const id=params.get('id');
+  let q=db.from('events').select('*');
+  q=id?q.eq('id',id).single():q.order('created_at',{ascending:false}).limit(1).single();
+  const{data,error}=await q;
+  if(error||!data){document.getElementById('detailsTitle').textContent='Événement introuvable';return;}
+  document.title=data.title+' | UniEvents';
+  const cat=getCat(data),catInfo=cat?CATS[cat]:null;
+  document.getElementById('detailsHero').style.backgroundImage=`url('${IMGS[data.id%IMGS.length]}')`;
+  if(catInfo){const c=document.getElementById('detailsCat');c.textContent=catInfo.emoji+' '+catInfo.label;}
+  document.getElementById('detailsTitle').textContent=data.title;
+  const fd=fmtDate(data.date);
+  document.getElementById('detailsDate').textContent=fd;
+  document.getElementById('detailsTime').textContent=data.time?'À '+data.time:'Heure à confirmer';
+  document.getElementById('detailsLocShort').textContent=data.location||'Campus';
+  document.getElementById('infoDate').textContent=fd;
+  document.getElementById('infoTime').textContent=data.time?'À '+data.time:'Heure à confirmer';
+  document.getElementById('infoLoc').textContent=data.location||'—';
+  document.getElementById('detailsDesc').textContent=data.description||'Aucune description disponible pour cet événement.';
+  document.getElementById('checkDate').textContent=fd;
+  document.getElementById('checkTime').textContent=data.time||'À confirmer';
+  document.getElementById('checkLoc').textContent=data.location||'Campus';
+  if(catInfo){const tag=document.getElementById('detailsTag');tag.textContent=catInfo.emoji+' '+catInfo.label;}
+  const initials=(data.title||'').slice(0,2).toUpperCase();
+  document.getElementById('orgAvatar').textContent=initials;
+  document.getElementById('orgName').textContent='Asso – '+data.title.split(' ')[0];
 }
-
-async function loadEvent() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-
-    let query = db.from('events').select('*');
-    query = id ? query.eq('id', id).single() : query.order('created_at', { ascending: false }).limit(1).single();
-
-    const { data, error } = await query;
-
-    if (error || !data) {
-        document.getElementById('detailsTitle').textContent = 'Événement introuvable';
-        return;
-    }
-
-    document.title = data.title + ' | Campus Events';
-    document.getElementById('detailsDate').textContent     = formatDate(data.date);
-    document.getElementById('detailsTitle').textContent    = data.title;
-    document.getElementById('detailsTime').textContent     = data.time ? 'À ' + data.time : 'Heure à confirmer';
-    document.getElementById('detailsLocation').textContent = data.location || '—';
-    document.getElementById('detailsDesc').textContent     = data.description || 'Aucune description disponible.';
-    document.getElementById('heroImg').style.backgroundImage = `url('${IMAGES[data.id % IMAGES.length]}')`;
-}
-
-window.onload = loadEvent;
+function reservePlace(e){e.preventDefault();showToast('Réservation enregistrée ! 🎉','🎟');}
+function shareEvent(e){e.preventDefault();navigator.clipboard?.writeText(window.location.href);showToast('Lien copié dans le presse-papier','📤');}
+window.onload=async()=>{await initAuth();await loadEvent();};
 </script>
 </body>
 </html>

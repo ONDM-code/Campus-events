@@ -1,113 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un événement | Campus Events</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créer un événement | UniEvents</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="navbar">
-    <div class="container flex-nav">
-        <a href="index.html" class="logo">Campus<span>Events</span></a>
-        <a href="index.html" class="btn-cancel" style="font-size:14px;font-weight:600;color:var(--muted);padding:9px 16px;border-radius:99px;transition:background .15s">← Retour à l'agenda</a>
+  <div class="container flex-nav">
+    <a href="index.html" class="logo"><span class="logo-sup"></span>Uni<span class="logo-accent">Events</span></a>
+    <div class="nav-right">
+      <div id="userChip" class="user-chip" style="display:none">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userName"></span>
+      </div>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Retour à l'agenda</a>
     </div>
+  </div>
 </header>
 
-<main class="container">
-    <div class="form-wrapper">
-        <div class="form-header">
-            <h1>Créer un événement</h1>
-            <p>Renseignez les informations et publiez dans l'agenda du campus.</p>
+<div class="container" style="padding-top:44px;padding-bottom:80px">
+  <div class="form-page-header">
+    <h1>Créer un événement</h1>
+    <p>Renseignez les informations et publiez dans l'agenda du campus en quelques clics.</p>
+  </div>
+
+  <div class="form-page-layout">
+    <div>
+      <!-- Infos de base -->
+      <div class="form-card">
+        <p class="form-card-title">Informations de base</p>
+        <div class="form-group">
+          <label for="title">Nom de l'événement *</label>
+          <input type="text" id="title" placeholder="Ex : Hackathon de Printemps 2026" required>
         </div>
-
-        <div class="form-card">
-            <p class="form-section-title">Informations de base</p>
-
-            <form id="eventForm">
-                <div class="form-group">
-                    <label for="title">Nom de l'événement</label>
-                    <input type="text" id="title" placeholder="Ex : Hackathon de Printemps 2026" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="time">Heure de début</label>
-                        <input type="time" id="time">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="location">Lieu</label>
-                    <input type="text" id="location" placeholder="Ex : Grande Halle, Amphi B, Stade..." required>
-                </div>
-
-                <div class="form-divider"></div>
-                <p class="form-section-title">Description</p>
-
-                <div class="form-group">
-                    <label for="description">À propos de cet événement</label>
-                    <textarea id="description" placeholder="Décrivez votre événement : programme, intervenants, prérequis..."></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn-cancel" onclick="history.back()">Annuler</button>
-                    <button type="submit" class="btn-submit" id="submitBtn">
-                        <span>Publier dans l'agenda</span>
-                        <span>→</span>
-                    </button>
-                </div>
-            </form>
+        <div class="form-group">
+          <label for="category">Catégorie</label>
+          <select id="category">
+            <option value="">Sélectionner une catégorie</option>
+            <option value="Hackathon">💻 Hackathon</option>
+            <option value="Conférence">🎤 Conférence</option>
+            <option value="Concert">🎵 Concert</option>
+            <option value="Sport">🏆 Sport</option>
+            <option value="Atelier">🎨 Atelier</option>
+            <option value="Afterwork">🥂 Afterwork</option>
+            <option value="Soirée">🌙 Soirée</option>
+            <option value="Forum">📋 Forum</option>
+          </select>
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Date *</label>
+            <input type="date" id="date" required>
+          </div>
+          <div class="form-group">
+            <label for="time">Heure de début</label>
+            <input type="time" id="time">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="location">Lieu *</label>
+          <input type="text" id="location" placeholder="Ex : Grande Halle, Amphi B, Stade Jean Macé…" required>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-card">
+        <p class="form-card-title">Description</p>
+        <div class="form-group">
+          <label for="description">À propos de cet événement</label>
+          <textarea id="description" placeholder="Décrivez votre événement : programme, intervenants, prérequis, ce que les participants vont vivre…"></textarea>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-card" style="padding:22px 32px">
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="history.back()">Annuler</button>
+          <button type="button" class="btn-submit" id="submitBtn" onclick="publishEvent()">
+            <span>🚀 Publier dans l'agenda</span>
+          </button>
+        </div>
+      </div>
     </div>
-</main>
 
-<div class="toast" id="toast">
-    <span>🎉</span><span id="toastMsg">Événement publié !</span>
+    <!-- Tips sidebar -->
+    <div class="tips-card">
+      <h3>Conseils pour un bon événement</h3>
+      <div class="tip-item">
+        <div class="tip-num">1</div>
+        <div class="tip-text"><strong>Nom accrocheur</strong>Choisissez un titre clair et mémorable qui reflète bien votre événement.</div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">2</div>
+        <div class="tip-text"><strong>Description détaillée</strong>Précisez le programme, les intervenants et ce que les étudiants vont apprendre ou vivre.</div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">3</div>
+        <div class="tip-text"><strong>Lieu précis</strong>Indiquez le bâtiment, la salle ou l'amphithéâtre exact pour faciliter l'accès.</div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">4</div>
+        <div class="tip-text"><strong>Catégorie appropriée</strong>Bien catégoriser votre événement aide les étudiants à le trouver plus facilement.</div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="toast" id="toast"><span id="toastIcon">🎉</span><span id="toastMsg">Événement publié !</span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://rgzabfwwviqpbrsqqlkp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
+const SUPABASE_URL='https://rgzabfwwviqpbrsqqlkp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
+const {createClient}=supabase; const db=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+function showToast(m,i='✓'){document.getElementById('toastMsg').textContent=m;document.getElementById('toastIcon').textContent=i;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-// Pré-remplir la date à aujourd'hui
-document.getElementById('date').valueAsDate = new Date();
+(async()=>{
+  const{data:{session}}=await db.auth.getSession();
+  if(!session){window.location.href='auth.html';return;}
+  const u=session.user,f=u.user_metadata?.first_name||u.email.split('@')[0];
+  document.getElementById('userAvatar').textContent=f.slice(0,2).toUpperCase();
+  document.getElementById('userName').textContent=f;
+  document.getElementById('userChip').style.display='flex';
+})();
 
-document.getElementById('eventForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span>Publication en cours...</span>';
+document.getElementById('date').valueAsDate=new Date();
 
-    const { error } = await db.from('events').insert({
-        title:       document.getElementById('title').value.trim(),
-        date:        document.getElementById('date').value,
-        time:        document.getElementById('time').value || null,
-        location:    document.getElementById('location').value.trim(),
-        description: document.getElementById('description').value.trim() || null,
-    });
-
-    if (error) {
-        btn.disabled = false;
-        btn.innerHTML = '<span>Publier dans l\'agenda</span><span>→</span>';
-        document.getElementById('toastMsg').textContent = 'Erreur lors de la publication';
-        document.getElementById('toast').classList.add('show');
-        setTimeout(() => document.getElementById('toast').classList.remove('show'), 2800);
-        return;
-    }
-
-    document.getElementById('toast').classList.add('show');
-    setTimeout(() => window.location.href = 'index.html', 1300);
-});
+async function publishEvent(){
+  const btn=document.getElementById('submitBtn');
+  const title=document.getElementById('title').value.trim();
+  const date=document.getElementById('date').value;
+  const loc=document.getElementById('location').value.trim();
+  const cat=document.getElementById('category').value;
+  if(!title||!date||!loc){showToast('Remplissez les champs obligatoires (*)','⚠️');return;}
+  btn.disabled=true;btn.innerHTML='<span>Publication en cours…</span>';
+  const fullTitle=cat?cat+' – '+title:title;
+  const{error}=await db.from('events').insert({title:fullTitle,date,time:document.getElementById('time').value||null,location:loc,description:document.getElementById('description').value.trim()||null});
+  if(error){btn.disabled=false;btn.innerHTML='<span>🚀 Publier dans l\'agenda</span>';showToast('Erreur lors de la publication','⚠️');return;}
+  showToast('Événement publié avec succès !','🎉');
+  setTimeout(()=>window.location.href='index.html',1400);
+}
 </script>
 </body>
 </html>

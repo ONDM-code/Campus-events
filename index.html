@@ -1,357 +1,162 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Events | Agenda</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniEvents · L'agenda des campus</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="navbar">
-    <div class="container flex-nav">
-        <a href="index.html" class="logo">Campus<span>Events</span></a>
-        <a href="create.html" class="btn-create">Créer un événement</a>
+  <div class="container flex-nav">
+    <a href="index.html" class="logo"><span class="logo-sup"></span>Uni<span class="logo-accent">Events</span></a>
+    <nav><ul class="nav-links">
+      <li><a href="index.html" class="active">Agenda</a></li>
+      <li><a href="#">Mes inscriptions</a></li>
+      <li><a href="#">Campus</a></li>
+    </ul></nav>
+    <div class="nav-right">
+      <div id="userChip" class="user-chip" style="display:none">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userName"></span>
+        <span class="badge-2fa" id="user2faBadge" style="display:none">2FA</span>
+      </div>
+      <a href="create.html" class="btn btn-primary btn-sm" id="createBtn" style="display:none">+ Créer</a>
+      <button onclick="handleLogout()" id="logoutBtn" class="btn btn-ghost btn-sm" style="display:none">Déconnexion</button>
+      <a href="auth.html" class="btn btn-primary btn-sm" id="loginBtn">Se connecter</a>
     </div>
+  </div>
 </header>
 
 <section class="hero">
-    <div class="container">
-        <div class="hero-inner">
-            <div class="hero-tag"><span class="hero-dot"></span> Agenda du campus</div>
-            <h1>Tous vos <em>événements</em><br>en un coup d'œil</h1>
-            <p>Hackathons, conférences, concerts… ne ratez plus rien.</p>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Rechercher un événement, un lieu...">
-                <button onclick="searchEvents()">Rechercher</button>
-            </div>
+  <div class="container hero-inner">
+    <div class="hero-layout">
+      <div>
+        <div class="hero-eyebrow"><span class="hero-dot"></span>Plateforme officielle des campus</div>
+        <h1>Vivez chaque<br><em>moment fort</em><br>de l'université</h1>
+        <p class="hero-sub">Hackathons, conférences, concerts, ateliers — tous les événements de votre campus réunis en un seul endroit.</p>
+        <div class="hero-stats">
+          <div><div class="hero-stat-n" id="statEvents">—</div><div class="hero-stat-l">événements à venir</div></div>
+          <div class="hero-stat-div"></div>
+          <div><div class="hero-stat-n">12</div><div class="hero-stat-l">campus connectés</div></div>
+          <div class="hero-stat-div"></div>
+          <div><div class="hero-stat-n">100%</div><div class="hero-stat-l">gratuit</div></div>
         </div>
+        <div class="search-wrap">
+          <div class="search-icon">🔍</div>
+          <input type="text" id="searchInput" placeholder="Rechercher un événement, un lieu…">
+          <div class="search-sep"></div>
+          <input class="search-location" type="text" placeholder="📍 Tous les campus">
+          <button class="search-btn" onclick="searchEvents()">Rechercher</button>
+        </div>
+      </div>
+      <div class="hero-featured" onclick="goToFirst()">
+        <div class="hero-featured-img" id="heroFeatImg" style="background-image:url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=800')"></div>
+        <div class="hero-featured-overlay"></div>
+        <div class="hero-featured-content">
+          <div class="hero-featured-cat">⭐ À la une</div>
+          <div class="hero-featured-title" id="heroFeatTitle">Chargement…</div>
+          <div class="hero-featured-meta"><span id="heroFeatDate">—</span><span id="heroFeatLoc">—</span></div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
-<div class="container">
-    <div class="app-layout">
-
-        <!-- ── Sidebar ── -->
-        <aside class="sidebar">
-            <!-- Mini calendrier -->
-            <div class="mini-cal">
-                <div class="cal-header">
-                    <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
-                    <span class="cal-month" id="calMonth"></span>
-                    <button class="cal-nav" onclick="changeMonth(1)">›</button>
-                </div>
-                <div class="cal-grid" id="calGrid"></div>
-            </div>
-
-            <!-- Filtres -->
-            <div class="sidebar-section">
-                <p class="sidebar-title">Catégories</p>
-                <div class="filter-list">
-                    <button class="filter-item active" onclick="filterCat('all', this)">
-                        <span class="filter-dot" style="background:linear-gradient(135deg,#7c22d4,#e040fb)"></span>Tous les événements
-                    </button>
-                    <button class="filter-item" onclick="filterCat('hackathon', this)">
-                        <span class="filter-dot" style="background:#7c22d4"></span>Hackathon
-                    </button>
-                    <button class="filter-item" onclick="filterCat('conférence', this)">
-                        <span class="filter-dot" style="background:#a855f7"></span>Conférence
-                    </button>
-                    <button class="filter-item" onclick="filterCat('concert', this)">
-                        <span class="filter-dot" style="background:#e040fb"></span>Concert
-                    </button>
-                    <button class="filter-item" onclick="filterCat('sport', this)">
-                        <span class="filter-dot" style="background:#c084fc"></span>Sport
-                    </button>
-                    <button class="filter-item" onclick="filterCat('atelier', this)">
-                        <span class="filter-dot" style="background:#8b78aa"></span>Atelier
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- ── Contenu principal ── -->
-        <main>
-            <div class="agenda-header">
-                <h2 class="agenda-title" id="agendaTitle">Événements à venir</h2>
-                <div class="view-toggle">
-                    <button class="view-btn active" id="btnAgenda" onclick="setView('agenda')">≡ Agenda</button>
-                    <button class="view-btn" id="btnGrid" onclick="setView('grid')">⊞ Grille</button>
-                </div>
-            </div>
-
-            <!-- Vue agenda -->
-            <div class="agenda-view" id="agendaView">
-                <div id="agendaContent"><div class="empty-state"><div class="empty-icon">📅</div>Chargement...</div></div>
-            </div>
-
-            <!-- Vue grille -->
-            <div class="grid-view" id="gridView">
-                <div id="gridContent"></div>
-            </div>
-        </main>
+<div class="cat-bar">
+  <div class="container">
+    <div class="cat-scroll">
+      <button class="cat-pill active" onclick="filterCat('all',this)">🎯 Tous</button>
+      <button class="cat-pill" onclick="filterCat('hackathon',this)">💻 Hackathon</button>
+      <button class="cat-pill" onclick="filterCat('conférence',this)">🎤 Conférence</button>
+      <button class="cat-pill" onclick="filterCat('concert',this)">🎵 Concert</button>
+      <button class="cat-pill" onclick="filterCat('sport',this)">🏆 Sport</button>
+      <button class="cat-pill" onclick="filterCat('atelier',this)">🎨 Atelier</button>
+      <button class="cat-pill" onclick="filterCat('afterwork',this)">🥂 Afterwork</button>
+      <button class="cat-pill" onclick="filterCat('soirée',this)">🌙 Soirée</button>
     </div>
+  </div>
 </div>
 
-<div class="toast" id="toast">
-    <span>✓</span><span id="toastMsg">Action effectuée</span>
+<div class="container">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+          <span class="cal-month-label" id="calMonth"></span>
+          <button class="cal-nav" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="sidebar-card">
+        <p class="sidebar-title">Catégories</p>
+        <button class="filter-item active" onclick="filterCat('all',this)"><span class="filter-dot" style="background:#4f35d2"></span>Tous<span class="filter-count" id="fc-all">0</span></button>
+        <button class="filter-item" onclick="filterCat('hackathon',this)"><span class="filter-dot" style="background:#4f35d2"></span>Hackathon<span class="filter-count" id="fc-hackathon">0</span></button>
+        <button class="filter-item" onclick="filterCat('conférence',this)"><span class="filter-dot" style="background:#7c3aed"></span>Conférence<span class="filter-count" id="fc-conférence">0</span></button>
+        <button class="filter-item" onclick="filterCat('concert',this)"><span class="filter-dot" style="background:#f97316"></span>Concert<span class="filter-count" id="fc-concert">0</span></button>
+        <button class="filter-item" onclick="filterCat('sport',this)"><span class="filter-dot" style="background:#10b981"></span>Sport<span class="filter-count" id="fc-sport">0</span></button>
+        <button class="filter-item" onclick="filterCat('atelier',this)"><span class="filter-dot" style="background:#fbbf24"></span>Atelier<span class="filter-count" id="fc-atelier">0</span></button>
+      </div>
+      <div class="sidebar-card" style="background:var(--c-ink);border-color:transparent">
+        <p style="font-family:var(--font-display);font-size:16px;font-weight:900;font-style:italic;color:white;margin-bottom:8px">Vous organisez un événement ?</p>
+        <p style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:16px;line-height:1.55">Publiez-le gratuitement sur le campus.</p>
+        <a href="create.html" class="btn btn-accent btn-sm" style="width:100%;justify-content:center;display:flex">+ Créer un événement</a>
+      </div>
+    </aside>
+    <main>
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" id="agendaTitle">Événements à venir</h2>
+          <p id="agendaCount" style="color:var(--c-muted);font-size:13px;margin-top:2px"></p>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" id="btnAgenda" onclick="setView('agenda')">≡ Liste</button>
+          <button class="view-btn" id="btnGrid" onclick="setView('grid')">⊞ Grille</button>
+        </div>
+      </div>
+      <div class="agenda-view" id="agendaView"><div id="agendaContent"><div class="empty-state"><div class="empty-icon">⏳</div><h3>Chargement…</h3></div></div></div>
+      <div class="grid-view" id="gridView"><div id="gridContent"></div></div>
+    </main>
+  </div>
 </div>
+
+<div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg">Action effectuée</span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ─── Config Supabase ───────────────────────────────────────
-const SUPABASE_URL = 'https://rgzabfwwviqpbrsqqlkp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
-// ──────────────────────────────────────────────────────────
-
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const IMAGES = [
-    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600',
-    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=600',
-    'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=600',
-    'https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&q=80&w=600',
-    'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=600',
-];
-
-let allEvents = [];
-let currentView = 'agenda';
-let calDate = new Date();
-
-// ── Helpers ──────────────────────────────────────────────
-
-function getImg(id) { return IMAGES[id % IMAGES.length]; }
-
-function fmtDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-}
-function fmtDayNum(dateStr) {
-    return new Date(dateStr + 'T00:00:00').getDate();
-}
-function fmtWeekday(dateStr) {
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'short' });
-}
-
-function isToday(dateStr) {
-    const today = new Date();
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toDateString() === today.toDateString();
-}
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toastMsg').textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2600);
-}
-
-// ── Mini calendrier ───────────────────────────────────────
-
-function renderCal() {
-    const year  = calDate.getFullYear();
-    const month = calDate.getMonth();
-    const mois  = calDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-    document.getElementById('calMonth').textContent = mois.charAt(0).toUpperCase() + mois.slice(1);
-
-    const eventDates = new Set(allEvents.map(e => e.date));
-    const today = new Date();
-
-    const firstDay = new Date(year, month, 1).getDay(); // 0=dim
-    const offset   = (firstDay + 6) % 7;               // lundi = 0
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    const days = ['L','M','M','J','V','S','D'];
-    let html = days.map(d => `<div class="cal-day-name">${d}</div>`).join('');
-
-    for (let i = 0; i < offset; i++) html += `<div class="cal-day empty"></div>`;
-
-    for (let d = 1; d <= daysInMonth; d++) {
-        const pad  = String(month + 1).padStart(2, '0');
-        const dPad = String(d).padStart(2, '0');
-        const iso  = `${year}-${pad}-${dPad}`;
-        const isT  = today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
-        const hasE = eventDates.has(iso);
-        html += `<div class="cal-day ${isT ? 'today' : ''} ${hasE ? 'has-event' : ''}" onclick="jumpToDate('${iso}')">${d}</div>`;
-    }
-
-    document.getElementById('calGrid').innerHTML = html;
-}
-
-function changeMonth(dir) {
-    calDate = new Date(calDate.getFullYear(), calDate.getMonth() + dir, 1);
-    renderCal();
-}
-
-function jumpToDate(iso) {
-    const el = document.getElementById('day-' + iso);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ── Rendu agenda ──────────────────────────────────────────
-
-function groupByDate(events) {
-    const map = {};
-    events.forEach(e => {
-        if (!map[e.date]) map[e.date] = [];
-        map[e.date].push(e);
-    });
-    return map;
-}
-
-function renderAgenda(events) {
-    const container = document.getElementById('agendaContent');
-    if (!events.length) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div>Aucun événement trouvé. <a href="create.html">Créez-en un !</a></div>`;
-        return;
-    }
-
-    const groups = groupByDate(events);
-    const sortedDates = Object.keys(groups).sort();
-
-    container.innerHTML = sortedDates.map(date => {
-        const dayEvents = groups[date];
-        const todayClass = isToday(date) ? 'today-num' : '';
-
-        const cards = dayEvents.map((ev, i) => `
-            <div class="agenda-card" style="animation-delay:${i * 0.06}s" onclick="window.location='details.html?id=${ev.id}'">
-                <div class="agenda-card-accent"></div>
-                <div class="agenda-card-img" style="background-image:url('${getImg(ev.id)}')"></div>
-                <div class="agenda-card-body">
-                    <p class="agenda-time">${ev.time ? '⏰ ' + ev.time : 'Toute la journée'}</p>
-                    <h3>${ev.title}</h3>
-                    <p class="agenda-loc">${ev.location || '—'}</p>
-                    ${ev.description ? `<p class="agenda-desc">${ev.description}</p>` : ''}
-                </div>
-                <div class="agenda-card-right">
-                    <span class="price-badge">Gratuit</span>
-                    <button class="btn-delete" onclick="event.stopPropagation(); deleteEvent(${ev.id})">Supprimer</button>
-                </div>
-            </div>
-        `).join('');
-
-        return `
-            <div class="day-group" id="day-${date}">
-                <div class="day-label">
-                    <div class="day-date-block">
-                        <span class="day-num ${todayClass}">${fmtDayNum(date)}</span>
-                        <span class="day-wd">${fmtWeekday(date)}</span>
-                    </div>
-                    <div class="day-line"></div>
-                </div>
-                ${cards}
-            </div>
-        `;
-    }).join('');
-}
-
-// ── Rendu grille ──────────────────────────────────────────
-
-function renderGrid(events) {
-    const container = document.getElementById('gridContent');
-    if (!events.length) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div>Aucun événement. <a href="create.html">Créez-en un !</a></div>`;
-        return;
-    }
-    container.innerHTML = events.map((ev, i) => `
-        <div class="eb-card" style="animation-delay:${i * 0.05}s" onclick="window.location='details.html?id=${ev.id}'">
-            <div class="eb-card-img" style="background-image:url('${getImg(ev.id)}')">
-                <span class="eb-card-badge">Campus</span>
-            </div>
-            <div class="eb-card-info">
-                <p class="date">${fmtDate(ev.date)} · ${ev.time || ''}</p>
-                <h3>${ev.title}</h3>
-                <p class="loc">${ev.location || ''}</p>
-                <div class="eb-card-footer">
-                    <span class="price-badge">Gratuit</span>
-                    <button onclick="event.stopPropagation(); deleteEvent(${ev.id})" class="btn-delete">Supprimer</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-function renderAll(events) {
-    renderAgenda(events);
-    renderGrid(events);
-    renderCal();
-}
-
-// ── Chargement Supabase ───────────────────────────────────
-
-async function loadEvents() {
-    const { data, error } = await db
-        .from('events')
-        .select('*')
-        .order('date', { ascending: true });
-
-    if (error) {
-        document.getElementById('agendaContent').innerHTML =
-            `<div class="empty-state">Erreur de connexion à Supabase.</div>`;
-        return;
-    }
-
-    allEvents = data;
-    document.getElementById('agendaTitle').textContent =
-        `${data.length} événement${data.length > 1 ? 's' : ''} à venir`;
-    renderAll(data);
-}
-
-// ── Filtres ───────────────────────────────────────────────
-
-function filterCat(cat, btn) {
-    document.querySelectorAll('.filter-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const filtered = cat === 'all'
-        ? allEvents
-        : allEvents.filter(e =>
-            e.title?.toLowerCase().includes(cat) ||
-            e.description?.toLowerCase().includes(cat)
-          );
-    renderAll(filtered);
-}
-
-function searchEvents() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
-    const filtered = !q ? allEvents : allEvents.filter(e =>
-        e.title?.toLowerCase().includes(q) ||
-        e.location?.toLowerCase().includes(q) ||
-        e.description?.toLowerCase().includes(q)
-    );
-    renderAll(filtered);
-    document.getElementById('agendaTitle').textContent =
-        q ? `${filtered.length} résultat${filtered.length > 1 ? 's' : ''} pour "${q}"` : `${allEvents.length} événements à venir`;
-}
-
-// ── Suppression ───────────────────────────────────────────
-
-async function deleteEvent(id) {
-    if (!confirm('Supprimer cet événement ?')) return;
-    const { error } = await db.from('events').delete().eq('id', id);
-    if (error) { showToast('Erreur lors de la suppression'); return; }
-    showToast('Événement supprimé');
-    loadEvents();
-}
-
-// ── Vue toggle ────────────────────────────────────────────
-
-function setView(v) {
-    currentView = v;
-    document.getElementById('agendaView').classList.toggle('hidden', v !== 'agenda');
-    document.getElementById('gridView').classList.toggle('active',  v === 'grid');
-    document.getElementById('btnAgenda').classList.toggle('active', v === 'agenda');
-    document.getElementById('btnGrid').classList.toggle('active',   v === 'grid');
-}
-
-// ── Init ──────────────────────────────────────────────────
-
-document.getElementById('searchInput').addEventListener('keyup', e => {
-    if (e.key === 'Enter') searchEvents();
-});
-
-window.onload = loadEvents;
+const SUPABASE_URL='https://rgzabfwwviqpbrsqqlkp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
+const {createClient}=supabase; const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+const IMGS=['https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600','https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=600','https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=600','https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&q=80&w=600','https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=600','https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=600'];
+const CATS={hackathon:{emoji:'💻',color:'#4f35d2'},conférence:{emoji:'🎤',color:'#7c3aed'},concert:{emoji:'🎵',color:'#f97316'},sport:{emoji:'🏆',color:'#10b981'},atelier:{emoji:'🎨',color:'#fbbf24'},afterwork:{emoji:'🥂',color:'#ec4899'},soirée:{emoji:'🌙',color:'#8b5cf6'}};
+let allEvents=[],calDate=new Date(),firstEventId=null;
+const gImg=id=>IMGS[id%IMGS.length];
+const fmtDate=s=>s?new Date(s+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'';
+const fmtDay=s=>new Date(s+'T00:00:00').getDate();
+const fmtWd=s=>new Date(s+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short'});
+const isToday=s=>{const t=new Date(),d=new Date(s+'T00:00:00');return d.toDateString()===t.toDateString();};
+function getCat(ev){return Object.keys(CATS).find(k=>(ev.title+' '+(ev.description||'')).toLowerCase().includes(k))||'campus';}
+function showToast(m,i='✓'){document.getElementById('toastMsg').textContent=m;document.getElementById('toastIcon').textContent=i;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
+async function initAuth(){const{data:{session}}=await db.auth.getSession();if(session){const u=session.user,f=u.user_metadata?.first_name||u.email.split('@')[0];document.getElementById('userAvatar').textContent=f.slice(0,2).toUpperCase();document.getElementById('userName').textContent=f;document.getElementById('userChip').style.display='flex';document.getElementById('createBtn').style.display='inline-flex';document.getElementById('logoutBtn').style.display='inline-flex';document.getElementById('loginBtn').style.display='none';try{const{data:ff}=await db.auth.mfa.listFactors();if(ff?.totp?.some(x=>x.status==='verified'))document.getElementById('user2faBadge').style.display='inline-block';}catch(e){}}}
+async function handleLogout(){await db.auth.signOut();showToast('Déconnexion réussie');setTimeout(()=>window.location.reload(),800);}
+function renderCal(){const yr=calDate.getFullYear(),mo=calDate.getMonth();const l=calDate.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});document.getElementById('calMonth').textContent=l.charAt(0).toUpperCase()+l.slice(1);const evD=new Set(allEvents.map(e=>e.date)),today=new Date();const offset=(new Date(yr,mo,1).getDay()+6)%7,days=new Date(yr,mo+1,0).getDate();let html=['L','M','M','J','V','S','D'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');for(let i=0;i<offset;i++)html+=`<div class="cal-day empty"></div>`;for(let d=1;d<=days;d++){const iso=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const isT=today.getFullYear()===yr&&today.getMonth()===mo&&today.getDate()===d;html+=`<div class="cal-day${isT?' today':''}${evD.has(iso)?' has-event':''}" onclick="jumpToDate('${iso}')">${d}</div>`;}document.getElementById('calGrid').innerHTML=html;}
+function changeMonth(dir){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+dir,1);renderCal();}
+function jumpToDate(iso){const el=document.getElementById('day-'+iso);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function updateCounts(){document.getElementById('fc-all').textContent=allEvents.length;['hackathon','conférence','concert','sport','atelier'].forEach(k=>{const el=document.getElementById('fc-'+k);if(el)el.textContent=allEvents.filter(e=>getCat(e)===k).length;});}
+function renderAgenda(events){const c=document.getElementById('agendaContent');if(!events.length){c.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><h3>Aucun événement</h3><p>Essayez une autre catégorie.</p></div>';return;}const groups={};events.forEach(e=>{if(!groups[e.date])groups[e.date]=[];groups[e.date].push(e);});c.innerHTML=Object.keys(groups).sort().map(date=>{const evs=groups[date];const cards=evs.map((ev,i)=>{const cat=getCat(ev),info=CATS[cat]||{emoji:'🎓',color:'var(--c-brand)'};return `<div class="agenda-card" style="animation-delay:${i*.07}s" onclick="window.location='details.html?id=${ev.id}'"><div class="agenda-card-stripe" style="background:${info.color}"></div><div class="agenda-card-img" style="background-image:url('${gImg(ev.id)}')"><div class="agenda-card-img-badge">${info.emoji} ${cat}</div></div><div class="agenda-card-body"><p class="agenda-tag" style="color:${info.color}">${info.emoji} ${cat.charAt(0).toUpperCase()+cat.slice(1)}</p><h3>${ev.title}</h3><p class="agenda-time">⏰ ${ev.time||'Toute la journée'}</p><p class="agenda-loc">${ev.location||'Campus universitaire'}</p>${ev.description?'<p class="agenda-desc">'+ev.description+'</p>':''}</div><div class="agenda-card-right"><span class="price-badge">Gratuit</span><button class="btn-delete" onclick="event.stopPropagation();deleteEvent(${ev.id})">🗑 Supprimer</button></div></div>`;}).join('');return `<div class="day-group" id="day-${date}"><div class="day-label"><div class="day-date-block"><span class="day-num${isToday(date)?' today-num':''}">${fmtDay(date)}</span><span class="day-wd">${fmtWd(date)}</span></div><div class="day-line"></div>${isToday(date)?'<span class="day-today-tag">Aujourd\'hui</span>':''}</div>${cards}</div>`;}).join('');}
+function renderGrid(events){const c=document.getElementById('gridContent');c.innerHTML=events.map((ev,i)=>{const cat=getCat(ev),info=CATS[cat]||{emoji:'🎓',color:'var(--c-brand)'};return `<div class="eb-card" style="animation-delay:${i*.06}s" onclick="window.location='details.html?id=${ev.id}'"><div class="eb-card-img" style="background-image:url('${gImg(ev.id)}')"><div class="eb-card-cat">${info.emoji} ${cat}</div></div><div class="eb-card-body"><p class="eb-card-date" style="color:${info.color}">${fmtDate(ev.date)}${ev.time?' · '+ev.time:''}</p><h3>${ev.title}</h3><p class="eb-card-loc">📍 ${ev.location||'Campus'}</p><div class="eb-card-footer"><span class="price-badge">Gratuit</span><button onclick="event.stopPropagation();deleteEvent(${ev.id})" class="btn-delete">🗑</button></div></div></div>`;}).join('');}
+function renderAll(ev){renderAgenda(ev);renderGrid(ev);renderCal();}
+function updateFeatured(events){if(!events.length)return;const ev=events[0];firstEventId=ev.id;document.getElementById('heroFeatImg').style.backgroundImage=`url('${IMGS[ev.id%IMGS.length].replace('w=600','w=800')}')`;document.getElementById('heroFeatTitle').textContent=ev.title;document.getElementById('heroFeatDate').textContent='📅 '+fmtDate(ev.date);document.getElementById('heroFeatLoc').textContent='📍 '+(ev.location||'Campus');}
+function goToFirst(){if(firstEventId)window.location.href='details.html?id='+firstEventId;}
+async function loadEvents(){const{data,error}=await db.from('events').select('*').order('date',{ascending:true});if(error){document.getElementById('agendaContent').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Erreur de connexion</h3></div>';return;}allEvents=data;document.getElementById('statEvents').textContent=data.length;document.getElementById('agendaCount').textContent=`${data.length} événement${data.length>1?'s':''} trouvé${data.length>1?'s':''}`;updateCounts();updateFeatured(data);renderAll(data);}
+function filterCat(cat,btn){document.querySelectorAll('.filter-item,.cat-pill').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.filter-item,.cat-pill').forEach(b=>{try{if(b.getAttribute('onclick')?.includes("'"+cat+"'"))b.classList.add('active');}catch(e){}});const filtered=cat==='all'?allEvents:allEvents.filter(e=>getCat(e)===cat);document.getElementById('agendaTitle').textContent=cat==='all'?'Événements à venir':(CATS[cat]?.emoji||'')+' '+cat.charAt(0).toUpperCase()+cat.slice(1);document.getElementById('agendaCount').textContent=`${filtered.length} événement${filtered.length>1?'s':''}`;renderAll(filtered);}
+function searchEvents(){const q=document.getElementById('searchInput').value.toLowerCase().trim();const filtered=!q?allEvents:allEvents.filter(e=>(e.title||'').toLowerCase().includes(q)||(e.location||'').toLowerCase().includes(q)||(e.description||'').toLowerCase().includes(q));document.getElementById('agendaTitle').textContent=q?`Résultats pour "${q}"`:'Événements à venir';document.getElementById('agendaCount').textContent=`${filtered.length} résultat${filtered.length>1?'s':''}`;renderAll(filtered);}
+async function deleteEvent(id){if(!confirm('Supprimer cet événement ?'))return;const{error}=await db.from('events').delete().eq('id',id);if(error){showToast('Erreur','⚠️');return;}showToast('Supprimé','🗑');loadEvents();}
+function setView(v){document.getElementById('agendaView').classList.toggle('hidden',v!=='agenda');document.getElementById('gridView').classList.toggle('active',v==='grid');document.getElementById('btnAgenda').classList.toggle('active',v==='agenda');document.getElementById('btnGrid').classList.toggle('active',v==='grid');}
+document.getElementById('searchInput').addEventListener('keyup',e=>{if(e.key==='Enter')searchEvents();});
+window.onload=async()=>{await initAuth();await loadEvents();};
 </script>
 </body>
 </html>

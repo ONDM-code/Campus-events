@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | Campus Events</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Auth page layout ── */
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+
+        .auth-wrapper {
+            flex: 1; display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* Left panel – branding */
+        .auth-panel-left {
+            background: var(--ink);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            justify-content: center; padding: 60px;
+        }
+        .auth-panel-left::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 80% at 90% 20%, rgba(168,85,247,0.55) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 60% at 5% 90%, rgba(224,64,251,0.3) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        .auth-panel-left > * { position: relative; z-index: 1; }
+
+        .auth-brand { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 900; color: white; margin-bottom: 48px; }
+        .auth-brand span { color: var(--primary-glow); }
+        .auth-tagline { font-family: 'Syne', sans-serif; font-size: clamp(26px, 3.5vw, 42px); font-weight: 900; color: white; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 18px; }
+        .auth-tagline em { font-style: normal; background: linear-gradient(90deg, var(--primary-glow), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .auth-sub { color: rgba(255,255,255,0.55); font-size: 15px; max-width: 340px; line-height: 1.65; margin-bottom: 44px; }
+
+        .auth-features { display: flex; flex-direction: column; gap: 14px; }
+        .auth-feature { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.75); font-size: 14px; }
+        .auth-feature-icon { width: 34px; height: 34px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+        /* Right panel – form */
+        .auth-panel-right {
+            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            padding: 48px 36px;
+        }
+        .auth-card {
+            width: 100%; max-width: 420px;
+        }
+
+        .auth-tabs {
+            display: flex; background: var(--surface);
+            border-radius: 12px; padding: 4px; margin-bottom: 32px;
+            border: 1px solid var(--border-light);
+        }
+        .auth-tab {
+            flex: 1; padding: 10px; border: none; background: none;
+            font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+            color: var(--muted); cursor: pointer; border-radius: 9px;
+            transition: all 0.2s;
+        }
+        .auth-tab.active {
+            background: white; color: var(--primary);
+            box-shadow: 0 2px 8px rgba(124,34,212,0.12);
+        }
+
+        .auth-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: -0.8px; margin-bottom: 6px; }
+        .auth-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 28px; }
+
+        /* Password strength */
+        .pw-strength-bar {
+            height: 4px; border-radius: 99px;
+            background: var(--border-light); margin-top: 8px; overflow: hidden;
+        }
+        .pw-strength-fill {
+            height: 100%; border-radius: 99px; width: 0%;
+            transition: width 0.3s, background 0.3s;
+        }
+        .pw-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+        /* 2FA section */
+        .twofa-section {
+            background: linear-gradient(135deg, rgba(124,34,212,0.06), rgba(224,64,251,0.04));
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius); padding: 20px; margin-top: 8px;
+        }
+        .twofa-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .twofa-icon { font-size: 20px; }
+        .twofa-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+        .twofa-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+        .toggle-switch {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-light);
+        }
+        .toggle-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+        .toggle {
+            position: relative; width: 44px; height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; inset: 0;
+            background: var(--border-light); border-radius: 99px; cursor: pointer;
+            transition: 0.25s;
+        }
+        .slider::before {
+            content: ''; position: absolute;
+            width: 18px; height: 18px; left: 3px; top: 3px;
+            background: white; border-radius: 50%;
+            transition: 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+        .toggle input:checked + .slider { background: var(--grad); }
+        .toggle input:checked + .slider::before { transform: translateX(20px); }
+
+        /* OTP / TOTP step */
+        .otp-step { display: none; }
+        .otp-step.visible { display: block; }
+        .main-form-step { display: block; }
+        .main-form-step.hidden { display: none; }
+
+        .otp-grid { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+        .otp-input {
+            width: 50px; height: 56px; text-align: center;
+            font-size: 22px; font-weight: 700; font-family: 'Syne', sans-serif;
+            border: 2px solid var(--border-light); border-radius: var(--radius-sm);
+            background: var(--white); color: var(--ink); outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .otp-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,34,212,0.12); }
+        .otp-input.filled { border-color: var(--primary-light); }
+
+        .qr-placeholder {
+            width: 140px; height: 140px; background: var(--surface);
+            border: 1px dashed var(--border-light); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 60px; margin: 0 auto 16px;
+        }
+        .secret-code {
+            background: var(--surface); border: 1px solid var(--border-light);
+            border-radius: 8px; padding: 10px 14px;
+            font-family: 'Courier New', monospace; font-size: 13px;
+            letter-spacing: 0.1em; color: var(--primary); text-align: center;
+            word-break: break-all; margin: 0 auto 16px; cursor: pointer;
+        }
+        .secret-code:hover { background: #ede0ff; }
+
+        /* Divider */
+        .form-or { display: flex; align-items: center; gap: 12px; margin: 22px 0; }
+        .form-or::before, .form-or::after { content: ''; flex: 1; height: 1px; background: var(--border-light); }
+        .form-or span { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+        /* Privacy checkbox */
+        .privacy-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: var(--surface); border-radius: 10px; padding: 14px;
+            border: 1px solid var(--border-light); margin-bottom: 20px;
+        }
+        .privacy-row input[type="checkbox"] { margin-top: 2px; accent-color: var(--primary); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+        .privacy-text { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+        .privacy-text a { color: var(--primary); font-weight: 600; }
+
+        /* Alert */
+        .auth-alert {
+            padding: 12px 14px; border-radius: 10px; font-size: 13px; font-weight: 500;
+            margin-bottom: 18px; display: none; align-items: center; gap: 8px;
+        }
+        .auth-alert.error { background: #fff0f5; color: #c0004e; border: 1px solid #ffc0d7; display: flex; }
+        .auth-alert.success { background: #f0fff4; color: #187a38; border: 1px solid #b2f0c8; display: flex; }
+        .auth-alert.info { background: #f5f0ff; color: var(--primary); border: 1px solid #d8b4fe; display: flex; }
+
+        /* Input with icon */
+        .input-wrap { position: relative; }
+        .input-wrap input { padding-right: 42px; }
+        .input-icon {
+            position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: var(--muted); font-size: 16px; user-select: none;
+            transition: color 0.15s;
+        }
+        .input-icon:hover { color: var(--primary); }
+
+        .forgot-link {
+            font-size: 12px; color: var(--primary); font-weight: 600;
+            cursor: pointer; display: block; text-align: right; margin-top: -12px; margin-bottom: 18px;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .auth-footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 24px; }
+        .auth-footer a { color: var(--primary); font-weight: 600; cursor: pointer; }
+
+        /* Loading spinner */
+        .spinner {
+            width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.4);
+            border-top-color: white; border-radius: 50%;
+            animation: spin 0.7s linear infinite; display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Back button in OTP step */
+        .btn-back {
+            background: none; border: 1px solid var(--border-light);
+            color: var(--muted); font-family: 'DM Sans', sans-serif;
+            font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 99px;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .btn-back:hover { background: var(--surface); color: var(--ink); }
+
+        @media (max-width: 820px) {
+            .auth-wrapper { grid-template-columns: 1fr; }
+            .auth-panel-left { display: none; }
+            .auth-panel-right { padding: 32px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container flex-nav">
+        <a href="index.html" class="logo">Campus<span>Events</span></a>
+        <span style="font-size:13px;color:var(--muted)">Espace sécurisé 🔒</span>
+    </div>
+</header>
+
+<div class="auth-wrapper">
+    <!-- ── Panneau gauche ── -->
+    <div class="auth-panel-left">
+        <div class="auth-brand">Campus<span>Events</span></div>
+        <h2 class="auth-tagline">L'agenda <em>étudiant</em><br>qui vous ressemble.</h2>
+        <p class="auth-sub">Rejoignez des milliers d'étudiants qui ne ratent plus aucun hackathon, conférence ou concert sur le campus.</p>
+        <div class="auth-features">
+            <div class="auth-feature">
+                <div class="auth-feature-icon">📅</div>
+                Agenda personnalisé en temps réel
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon">🔔</div>
+                Notifications pour vos événements favoris
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon">🛡️</div>
+                Double authentification pour votre sécurité
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon">✨</div>
+                Créez et gérez vos propres événements
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Panneau droit (formulaire) ── -->
+    <div class="auth-panel-right">
+        <div class="auth-card">
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">Se connecter</button>
+                <button class="auth-tab" onclick="switchTab('signup')">Créer un compte</button>
+            </div>
+
+            <!-- Alert -->
+            <div class="auth-alert" id="authAlert"></div>
+
+            <!-- ══ STEP 1 : Formulaire principal ══ -->
+            <div class="main-form-step" id="mainFormStep">
+
+                <!-- ── CONNEXION ── -->
+                <div id="loginForm">
+                    <h2 class="auth-title">Bon retour ! 👋</h2>
+                    <p class="auth-desc">Connectez-vous pour accéder à l'agenda du campus.</p>
+
+                    <div class="form-group">
+                        <label for="loginEmail">Adresse e-mail</label>
+                        <input type="email" id="loginEmail" placeholder="vous@campus.fr" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPw">Mot de passe</label>
+                        <div class="input-wrap">
+                            <input type="password" id="loginPw" placeholder="••••••••" required>
+                            <span class="input-icon" onclick="togglePw('loginPw', this)">👁</span>
+                        </div>
+                    </div>
+                    <a class="forgot-link" onclick="forgotPassword()">Mot de passe oublié ?</a>
+
+                    <button class="btn-submit" style="width:100%;justify-content:center" onclick="handleLogin()">
+                        Se connecter
+                    </button>
+                </div>
+
+                <!-- ── INSCRIPTION ── -->
+                <div id="signupForm" style="display:none">
+                    <h2 class="auth-title">Créer un compte</h2>
+                    <p class="auth-desc">Rejoignez la communauté Campus Events.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="signupFirst">Prénom</label>
+                            <input type="text" id="signupFirst" placeholder="Emma" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupLast">Nom</label>
+                            <input type="text" id="signupLast" placeholder="Durand" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupEmail">Adresse e-mail</label>
+                        <input type="email" id="signupEmail" placeholder="vous@campus.fr" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupPw">Mot de passe</label>
+                        <div class="input-wrap">
+                            <input type="password" id="signupPw" placeholder="Minimum 8 caractères" oninput="checkStrength(this.value)" required>
+                            <span class="input-icon" onclick="togglePw('signupPw', this)">👁</span>
+                        </div>
+                        <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwFill"></div></div>
+                        <p class="pw-hint" id="pwHint">Entrez un mot de passe</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupPwConfirm">Confirmer le mot de passe</label>
+                        <div class="input-wrap">
+                            <input type="password" id="signupPwConfirm" placeholder="••••••••" required>
+                            <span class="input-icon" onclick="togglePw('signupPwConfirm', this)">👁</span>
+                        </div>
+                    </div>
+
+                    <!-- 2FA toggle -->
+                    <div class="twofa-section">
+                        <div class="twofa-header">
+                            <span class="twofa-icon">🔐</span>
+                            <span class="twofa-title">Authentification à 2 facteurs (2FA)</span>
+                        </div>
+                        <p class="twofa-desc">Ajoutez une couche de sécurité supplémentaire avec une application d'authentification (Google Authenticator, Authy…).</p>
+                        <div class="toggle-switch">
+                            <span class="toggle-label">Activer la 2FA</span>
+                            <label class="toggle">
+                                <input type="checkbox" id="enable2fa" onchange="toggle2FAPreview()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-divider" style="margin:20px 0"></div>
+
+                    <!-- Confidentialité -->
+                    <div class="privacy-row">
+                        <input type="checkbox" id="privacyCheck">
+                        <p class="privacy-text">
+                            J'accepte la <a href="#" onclick="showPrivacy()">politique de confidentialité</a> et les
+                            <a href="#" onclick="showTerms()">conditions d'utilisation</a> de Campus Events.
+                            Mes données sont traitées uniquement dans le cadre de l'agenda étudiant.
+                        </p>
+                    </div>
+
+                    <button class="btn-submit" style="width:100%;justify-content:center" onclick="handleSignup()">
+                        Créer mon compte →
+                    </button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 2 : Configuration 2FA (TOTP) ══ -->
+            <div class="otp-step" id="totpSetupStep">
+                <h2 class="auth-title">🔐 Configuration 2FA</h2>
+                <p class="auth-desc">Scannez ce QR code avec votre application d'authentification.</p>
+
+                <div id="qrCodeContainer" style="text-align:center;margin-bottom:16px">
+                    <div class="qr-placeholder" id="qrPlaceholder">⌛</div>
+                </div>
+
+                <p style="font-size:12.5px;color:var(--muted);text-align:center;margin-bottom:8px">
+                    Ou entrez ce code manuellement dans votre application :
+                </p>
+                <div class="secret-code" id="totpSecret" onclick="copySecret()" title="Cliquer pour copier">
+                    Génération en cours…
+                </div>
+
+                <p style="font-size:13px;color:var(--ink);font-weight:600;text-align:center;margin-bottom:4px">
+                    Entrez le code à 6 chiffres affiché par l'application :
+                </p>
+                <div class="otp-grid" id="totpGrid">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                </div>
+
+                <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
+                    <button class="btn-back" onclick="backToForm('signup')">← Retour</button>
+                    <button class="btn-submit" onclick="verifyTOTPSetup()">Vérifier et activer</button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 3 : Vérification 2FA à la connexion ══ -->
+            <div class="otp-step" id="totpLoginStep">
+                <h2 class="auth-title">🔐 Vérification 2FA</h2>
+                <p class="auth-desc">Entrez le code à 6 chiffres de votre application d'authentification.</p>
+
+                <div class="auth-alert info" id="totpInfo" style="display:flex">
+                    📱 Ouvrez votre application Authenticator et saisissez le code affiché.
+                </div>
+
+                <div class="otp-grid" id="loginOtpGrid">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                    <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+                </div>
+
+                <button class="btn-submit" style="width:100%;justify-content:center;margin-top:8px" onclick="verifyTOTPLogin()">
+                    Vérifier
+                </button>
+                <p style="text-align:center;margin-top:12px;font-size:12.5px;color:var(--muted)">
+                    Code invalide ? <a style="color:var(--primary);cursor:pointer;font-weight:600" onclick="backToForm('login')">Retour</a>
+                </p>
+            </div>
+
+            <!-- ══ Footer ══ -->
+            <p class="auth-footer" id="authFooter">
+                Pas encore de compte ?
+                <a onclick="switchTab('signup')">Créer un compte</a>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Politique de confidentialité -->
+<div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(22,8,38,0.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
+    <div style="background:white;border-radius:18px;max-width:560px;width:100%;padding:36px;max-height:80vh;overflow-y:auto;position:relative">
+        <button onclick="closeModal('privacyModal')" style="position:absolute;top:18px;right:18px;background:var(--surface);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:900;margin-bottom:16px">🔒 Politique de confidentialité</h2>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.75;margin-bottom:12px">
+            <strong>Données collectées :</strong> Prénom, nom, adresse e-mail, et optionnellement une clé TOTP pour la 2FA.
+        </p>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.75;margin-bottom:12px">
+            <strong>Finalité :</strong> Authentification sur la plateforme Campus Events, gestion de votre compte, et personnalisation de l'agenda étudiant.
+        </p>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.75;margin-bottom:12px">
+            <strong>Conservation :</strong> Vos données sont conservées tant que votre compte est actif. Vous pouvez demander la suppression à tout moment.
+        </p>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.75;margin-bottom:12px">
+            <strong>Partage :</strong> Vos données ne sont jamais revendues ni partagées avec des tiers à des fins commerciales.
+        </p>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.75;margin-bottom:12px">
+            <strong>Sécurité :</strong> Stockage chiffré via Supabase (infrastructure conforme RGPD). Mots de passe hashés avec bcrypt. Clés 2FA chiffrées au repos.
+        </p>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.75">
+            <strong>Vos droits (RGPD) :</strong> Accès, rectification, effacement, portabilité — contactez campus-events@campus.fr
+        </p>
+    </div>
+</div>
+
+<div class="toast" id="toast">
+    <span id="toastIcon">✓</span><span id="toastMsg">Action effectuée</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ─── Supabase ───────────────────────────────────────────────
+const SUPABASE_URL = 'https://rgzabfwwviqpbrsqqlkp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnemFiZnd3dmlxcGJyc3FxbGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDQ5OTgsImV4cCI6MjA5MTM4MDk5OH0.LH_kfGJEgZsj87P62wJ8JhsUAI4XWXTgVFP1KargpE4';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── State ──────────────────────────────────────────────────
+let currentTab = 'login';
+let totpFactorId = null;
+let totpChallengeId = null;
+
+// ─── Helpers UI ─────────────────────────────────────────────
+function showAlert(msg, type = 'error') {
+    const el = document.getElementById('authAlert');
+    el.textContent = msg;
+    el.className = 'auth-alert ' + type;
+}
+function hideAlert() {
+    document.getElementById('authAlert').className = 'auth-alert';
+}
+function showToast(msg, icon = '✓') {
+    document.getElementById('toastMsg').textContent = msg;
+    document.getElementById('toastIcon').textContent = icon;
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+function setLoading(btn, loading) {
+    if (loading) {
+        btn.disabled = true;
+        btn.dataset.orig = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner"></span>';
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.orig;
+    }
+}
+
+function togglePw(id, icon) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; icon.textContent = '🙈'; }
+    else { inp.type = 'password'; icon.textContent = '👁'; }
+}
+
+// ─── OTP inputs ─────────────────────────────────────────────
+function initOtpInputs(gridId) {
+    const inputs = document.querySelectorAll(`#${gridId} .otp-input`);
+    inputs.forEach((inp, i) => {
+        inp.value = '';
+        inp.classList.remove('filled');
+        inp.addEventListener('input', () => {
+            inp.value = inp.value.replace(/\D/g, '').slice(-1);
+            inp.classList.toggle('filled', inp.value !== '');
+            if (inp.value && i < inputs.length - 1) inputs[i + 1].focus();
+        });
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i - 1].focus();
+        });
+        inp.addEventListener('paste', e => {
+            e.preventDefault();
+            const digits = (e.clipboardData.getData('text').replace(/\D/g, '')).slice(0, 6);
+            digits.split('').forEach((d, j) => { if (inputs[j]) { inputs[j].value = d; inputs[j].classList.add('filled'); } });
+            if (inputs[digits.length]) inputs[digits.length].focus();
+        });
+    });
+}
+function getOtpValue(gridId) {
+    return [...document.querySelectorAll(`#${gridId} .otp-input`)].map(i => i.value).join('');
+}
+
+// ─── Tabs ────────────────────────────────────────────────────
+function switchTab(tab) {
+    currentTab = tab;
+    hideAlert();
+    document.querySelectorAll('.auth-tab').forEach((b, i) => {
+        b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'signup'));
+    });
+    document.getElementById('loginForm').style.display   = tab === 'login'  ? 'block' : 'none';
+    document.getElementById('signupForm').style.display  = tab === 'signup' ? 'block' : 'none';
+    document.getElementById('mainFormStep').classList.remove('hidden');
+    document.getElementById('totpSetupStep').classList.remove('otp-step');
+    document.getElementById('totpSetupStep').classList.add('otp-step');
+    document.getElementById('totpLoginStep').classList.remove('otp-step');
+    document.getElementById('totpLoginStep').classList.add('otp-step');
+    document.getElementById('authFooter').innerHTML = tab === 'login'
+        ? 'Pas encore de compte ? <a onclick="switchTab(\'signup\')">Créer un compte</a>'
+        : 'Déjà un compte ? <a onclick="switchTab(\'login\')">Se connecter</a>';
+}
+
+function backToForm(tab) {
+    document.getElementById('totpSetupStep').classList.add('otp-step');
+    document.getElementById('totpLoginStep').classList.add('otp-step');
+    document.getElementById('mainFormStep').classList.remove('hidden');
+    switchTab(tab);
+}
+
+// ─── Password strength ───────────────────────────────────────
+function checkStrength(pw) {
+    const fill = document.getElementById('pwFill');
+    const hint = document.getElementById('pwHint');
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    const levels = [
+        { w: '0%',   bg: 'transparent', txt: 'Entrez un mot de passe' },
+        { w: '25%',  bg: '#f87171',     txt: '⚠️ Très faible' },
+        { w: '50%',  bg: '#fb923c',     txt: '🟠 Faible' },
+        { w: '75%',  bg: '#facc15',     txt: '🟡 Correct' },
+        { w: '100%', bg: '#4ade80',     txt: '✅ Fort' },
+    ];
+    const lvl = pw.length === 0 ? levels[0] : levels[score];
+    fill.style.width = lvl.w;
+    fill.style.background = lvl.bg;
+    hint.textContent = lvl.txt;
+}
+
+// ─── 2FA preview toggle ──────────────────────────────────────
+function toggle2FAPreview() {
+    // visual feedback only – actual TOTP setup happens after account creation
+}
+
+// ─── LOGIN ───────────────────────────────────────────────────
+async function handleLogin() {
+    hideAlert();
+    const email = document.getElementById('loginEmail').value.trim();
+    const pw    = document.getElementById('loginPw').value;
+    if (!email || !pw) { showAlert('Veuillez remplir tous les champs.'); return; }
+
+    const btn = document.querySelector('#loginForm .btn-submit');
+    setLoading(btn, true);
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
+    setLoading(btn, false);
+
+    if (error) {
+        showAlert('Email ou mot de passe incorrect. Vérifiez vos identifiants.');
+        return;
+    }
+
+    // Check if user has 2FA enrolled
+    const { data: factors } = await db.auth.mfa.listFactors();
+    const totpFactor = factors?.totp?.find(f => f.status === 'verified');
+
+    if (totpFactor) {
+        // User has 2FA – need to challenge
+        totpFactorId = totpFactor.id;
+        const { data: chal, error: chalErr } = await db.auth.mfa.challenge({ factorId: totpFactorId });
+        if (chalErr) { showAlert('Erreur lors de la demande 2FA.'); return; }
+        totpChallengeId = chal.id;
+        document.getElementById('mainFormStep').classList.add('hidden');
+        document.getElementById('totpLoginStep').classList.remove('otp-step');
+        document.getElementById('totpLoginStep').classList.add('otp-step', 'visible');
+        initOtpInputs('loginOtpGrid');
+        document.querySelector('#loginOtpGrid .otp-input').focus();
+    } else {
+        showToast('Connexion réussie ! 🎉', '🎉');
+        setTimeout(() => window.location.href = 'index.html', 900);
+    }
+}
+
+async function verifyTOTPLogin() {
+    const code = getOtpValue('loginOtpGrid');
+    if (code.length < 6) { showAlert('Entrez les 6 chiffres du code.'); return; }
+
+    const btn = document.querySelector('#totpLoginStep .btn-submit');
+    setLoading(btn, true);
+
+    const { error } = await db.auth.mfa.verify({
+        factorId:    totpFactorId,
+        challengeId: totpChallengeId,
+        code
+    });
+    setLoading(btn, false);
+
+    if (error) { showAlert('Code invalide ou expiré. Réessayez.'); return; }
+    showToast('Connexion sécurisée ! 🔐', '🔐');
+    setTimeout(() => window.location.href = 'index.html', 900);
+}
+
+// ─── SIGNUP ──────────────────────────────────────────────────
+async function handleSignup() {
+    hideAlert();
+    const first   = document.getElementById('signupFirst').value.trim();
+    const last    = document.getElementById('signupLast').value.trim();
+    const email   = document.getElementById('signupEmail').value.trim();
+    const pw      = document.getElementById('signupPw').value;
+    const pwConf  = document.getElementById('signupPwConfirm').value;
+    const privacy = document.getElementById('privacyCheck').checked;
+    const want2fa = document.getElementById('enable2fa').checked;
+
+    if (!first || !last || !email || !pw || !pwConf) { showAlert('Veuillez remplir tous les champs.'); return; }
+    if (pw.length < 8) { showAlert('Le mot de passe doit faire au moins 8 caractères.'); return; }
+    if (pw !== pwConf) { showAlert('Les mots de passe ne correspondent pas.'); return; }
+    if (!privacy) { showAlert('Veuillez accepter la politique de confidentialité.'); return; }
+
+    const btn = document.querySelector('#signupForm .btn-submit');
+    setLoading(btn, true);
+
+    const { data, error } = await db.auth.signUp({
+        email,
+        password: pw,
+        options: { data: { first_name: first, last_name: last } }
+    });
+    setLoading(btn, false);
+
+    if (error) {
+        showAlert(error.message.includes('already') ? 'Un compte existe déjà avec cet email.' : 'Erreur lors de la création du compte.');
+        return;
+    }
+
+    if (want2fa) {
+        // Enroll TOTP
+        await setupTOTP();
+    } else {
+        showAlert('Compte créé ! Vérifiez votre e-mail pour confirmer votre inscription.', 'success');
+    }
+}
+
+async function setupTOTP() {
+    const { data, error } = await db.auth.mfa.enroll({ factorType: 'totp', issuer: 'CampusEvents' });
+    if (error) { showAlert('Erreur lors de la configuration 2FA. Réessayez.'); return; }
+
+    totpFactorId = data.id;
+    const secret = data.totp.secret;
+    const qrUri  = data.totp.qr_code; // SVG data URI from Supabase
+
+    document.getElementById('mainFormStep').classList.add('hidden');
+    document.getElementById('totpSetupStep').classList.remove('otp-step');
+    document.getElementById('totpSetupStep').classList.add('otp-step', 'visible');
+
+    // Display QR code
+    const qrEl = document.getElementById('qrPlaceholder');
+    if (qrUri && qrUri.startsWith('data:')) {
+        qrEl.outerHTML = `<img src="${qrUri}" width="140" height="140" style="border-radius:10px;border:1px solid var(--border-light)" alt="QR 2FA">`;
+    } else {
+        qrEl.textContent = '📱';
+    }
+
+    // Display secret
+    document.getElementById('totpSecret').textContent = secret;
+
+    initOtpInputs('totpGrid');
+    document.querySelector('#totpGrid .otp-input').focus();
+}
+
+function copySecret() {
+    const secret = document.getElementById('totpSecret').textContent;
+    navigator.clipboard.writeText(secret).then(() => showToast('Code secret copié !', '📋'));
+}
+
+async function verifyTOTPSetup() {
+    const code = getOtpValue('totpGrid');
+    if (code.length < 6) { showAlert('Entrez les 6 chiffres du code de votre application.'); return; }
+
+    const btn = document.querySelector('#totpSetupStep .btn-submit');
+    setLoading(btn, true);
+
+    // Challenge then verify
+    const { data: chal, error: chalErr } = await db.auth.mfa.challenge({ factorId: totpFactorId });
+    if (chalErr) { setLoading(btn, false); showAlert('Erreur de défi 2FA.'); return; }
+
+    const { error } = await db.auth.mfa.verify({
+        factorId:    totpFactorId,
+        challengeId: chal.id,
+        code
+    });
+    setLoading(btn, false);
+
+    if (error) { showAlert('Code invalide. Vérifiez votre application et réessayez.'); return; }
+
+    showToast('2FA activée avec succès ! 🔐', '🔐');
+    showAlert('Compte créé et 2FA activée ! Vérifiez votre e-mail pour confirmer.', 'success');
+    setTimeout(() => {
+        document.getElementById('totpSetupStep').classList.add('otp-step');
+        document.getElementById('mainFormStep').classList.remove('hidden');
+        switchTab('login');
+    }, 2500);
+}
+
+// ─── Mot de passe oublié ─────────────────────────────────────
+async function forgotPassword() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) { showAlert('Entrez votre e-mail ci-dessus, puis cliquez sur ce lien.'); return; }
+    const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/auth.html' });
+    if (error) { showAlert('Erreur lors de l\'envoi. Vérifiez l\'adresse e-mail.'); return; }
+    showAlert('E-mail de réinitialisation envoyé ! Vérifiez votre boîte de réception.', 'success');
+}
+
+// ─── Modals ──────────────────────────────────────────────────
+function showPrivacy() {
+    document.getElementById('privacyModal').style.display = 'flex';
+}
+function showTerms() {
+    showToast('Conditions d\'utilisation à venir.', 'ℹ️');
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+// ─── Init ────────────────────────────────────────────────────
+// If already logged in, redirect
+db.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = 'index.html';
+});
+
+// Keyboard Enter support
+document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (currentTab === 'login' && !document.getElementById('loginForm').closest('.main-form-step').classList.contains('hidden')) handleLogin();
+    else if (currentTab === 'signup') handleSignup();
+});
+</script>
+</body>
+</html>
